@@ -2,7 +2,6 @@ import numpy as np
 
 
 def softmax(x):
-    # Subtract maximum for numerical stability
     x = x - np.max(x, axis=-1, keepdims=True)
 
     exp_x = np.exp(x)
@@ -14,14 +13,19 @@ def softmax(x):
     )
 
 
-class SelfAttention:
+class MultiHeadCausalAttention:
 
-    def __init__(self, embedding_dim):
+    def __init__(self, embedding_dim, num_heads):
+
+        assert embedding_dim % num_heads == 0
+
         self.embedding_dim = embedding_dim
+        self.num_heads = num_heads
+        self.head_dim = embedding_dim // num_heads
 
-        # Trainable matrices
         scale = 0.02
 
+        # One large matrix for each projection.
         self.W_Q = (
             np.random.randn(
                 embedding_dim,
@@ -43,22 +47,107 @@ class SelfAttention:
             ) * scale
         )
 
+        # Output projection
+        self.W_O = (
+            np.random.randn(
+                embedding_dim,
+                embedding_dim
+            ) * scale
+        )
+
     def forward(self, x):
 
-        # Create queries, keys and values
+        sequence_length = x.shape[0]
+
+        # --------------------------------
+        # 1. Create Q, K and V
+        # --------------------------------
+
         Q = x @ self.W_Q
         K = x @ self.W_K
         V = x @ self.W_V
 
-        # Attention scores
-        scores = (
-            Q @ K.T
-        ) / np.sqrt(self.embedding_dim)
+        # --------------------------------
+        # 2. Split into attention heads
+        # --------------------------------
 
-        # Convert scores to probabilities
+        Q = Q.reshape(
+            sequence_length,
+            self.num_heads,
+            self.head_dim
+        )
+
+        K = K.reshape(
+            sequence_length,
+            self.num_heads,
+            self.head_dim
+        )
+
+        V = V.reshape(
+            sequence_length,
+            self.num_heads,
+            self.head_dim
+        )
+
+        # --------------------------------
+        # 3. Move heads before sequence
+        # --------------------------------
+
+        Q = Q.transpose(1, 0, 2)
+        K = K.transpose(1, 0, 2)
+        V = V.transpose(1, 0, 2)
+
+        # Shape:
+        # (heads, sequence, head_dim)
+
+        # --------------------------------
+        # 4. Calculate attention scores
+        # --------------------------------
+
+        scores = (
+            Q @ K.transpose(0, 2, 1)
+        ) / np.sqrt(self.head_dim)
+
+        # Shape:
+        # (heads, sequence, sequence)
+
+        # --------------------------------
+        # 5. Causal mask
+        # --------------------------------
+
+        mask = np.tril(
+            np.ones(
+                (sequence_length, sequence_length)
+            )
+        )
+
+        scores = np.where(
+            mask == 1,
+            scores,
+            -1e9
+        )
+
+        # --------------------------------
+        # 6. Softmax
+        # --------------------------------
+
         weights = softmax(scores)
 
-        # Weighted combination of values
-        output = weights @ V
+        # --------------------------------
+        # 7. Weighted values
+        # --------------------------------
 
-        return output, weights
+        head_outputs = weights @ V
+
+        # --------------------------------
+        # 8. Put heads back together
+        # --------------------------------
+
+        head_outputs = head_outputs.transpose(
+            1, 0, 2
+        )
+
+        combined = head_outputs.reshape(
+            sequence_length,
+            self.embedding_dim
+       
