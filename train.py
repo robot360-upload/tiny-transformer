@@ -2,6 +2,7 @@ from tokenizer import Tokenizer
 from embedding import Embedding
 from positional_encoding import PositionalEncoding
 from attention import MultiHeadCausalAttention
+from transformer_block import TransformerBlock
 
 
 # Training text
