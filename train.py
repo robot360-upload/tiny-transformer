@@ -1,3 +1,5 @@
+import numpy as np
+
 from tokenizer import Tokenizer
 from embedding import Embedding
 from positional_encoding import PositionalEncoding
