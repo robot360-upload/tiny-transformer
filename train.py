@@ -79,3 +79,42 @@ block_output, block_weights = block.forward(x)
 
 print("\nTransformer block output:", block_output.shape)
 print("Transformer block works!")
+
+# Output projection
+output_projection = OutputProjection(
+    embedding_dim,
+    tokenizer.vocab_size
+)
+
+logits = output_projection.forward(
+    block_output
+)
+
+print("\nLogits shape:", logits.shape)
+
+# Convert logits to probabilities
+probabilities = output_projection.probabilities(
+    block_output
+)
+
+print("Probabilities shape:", probabilities.shape)
+
+print("\nProbability row sums:")
+print(probabilities.sum(axis=1))
+
+# Targets
+targets = np.array(tokens)
+
+print("\nTargets:", targets)
+
+# Cross-entropy loss
+loss_function = CrossEntropyLoss()
+
+loss = loss_function.forward(
+    probabilities,
+    targets
+)
+
+print("\nLoss:", loss)
+
+print("\nOutput projection and loss work!")
