@@ -59,6 +59,6 @@ print("\nAttention weights:")
 print(weights)
 
 print("\nRow sums:")
-print(weights.sum(axis=1))
+print(weights.sum(axis=2))
 
 print("\nEverything works!")
