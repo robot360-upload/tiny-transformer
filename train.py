@@ -47,6 +47,7 @@ print("After positional encoding:", x.shape)
 
 
 # Self-attention
+# Self-attention
 attention = MultiHeadCausalAttention(
     embedding_dim,
     num_heads
@@ -63,3 +64,16 @@ print("\nRow sums:")
 print(weights.sum(axis=2))
 
 print("\nEverything works!")
+
+
+# Transformer block
+block = TransformerBlock(
+    embedding_dim=embedding_dim,
+    num_heads=num_heads,
+    hidden_dim=64
+)
+
+block_output, block_weights = block.forward(x)
+
+print("\nTransformer block output:", block_output.shape)
+print("Transformer block works!")
