@@ -73,22 +73,22 @@ class TransformerBlock:
         )
 
     def forward(self, x):
-    # Self-attention
-    attention_output, weights = (
-        self.attention.forward(x)
-    )
+        # Self-attention
+        attention_output, weights = (
+            self.attention.forward(x)
+        )
 
-    # First residual connection + LayerNorm
-    x = self.norm1.forward(
-        x + attention_output
-    )
+        # First residual connection + LayerNorm
+        x = self.norm1.forward(
+            x + attention_output
+        )
 
-    # Feed-forward network
-    ff_output = self.feed_forward.forward(x)
+        # Feed-forward network
+        ff_output = self.feed_forward.forward(x)
 
-    # Second residual connection + LayerNorm
-    x = self.norm2.forward(
-        x + ff_output
-    )
+        # Second residual connection + LayerNorm
+        x = self.norm2.forward(
+            x + ff_output
+        )
 
-    return x, weights
+        return x, weights
