@@ -22,6 +22,7 @@ print("\nTokens:", tokens)
 
 # Embedding
 embedding_dim = 16
+num_heads = 4
 
 embedding = Embedding(
     tokenizer.vocab_size,
