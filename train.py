@@ -3,6 +3,8 @@ from embedding import Embedding
 from positional_encoding import PositionalEncoding
 from attention import MultiHeadCausalAttention
 from transformer_block import TransformerBlock
+from output import OutputProjection
+from loss import CrossEntropyLoss
 
 
 # Training text
