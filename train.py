@@ -45,7 +45,10 @@ print("After positional encoding:", x.shape)
 
 
 # Self-attention
-attention = MultiHeadCausalAttention(embedding_dim)
+attention = MultiHeadCausalAttention(
+    embedding_dim,
+    num_heads
+)
 
 output, weights = attention.forward(x)
 
