@@ -1,7 +1,7 @@
 from tokenizer import Tokenizer
 from embedding import Embedding
 from positional_encoding import PositionalEncoding
-from attention import SelfAttention
+from attention import MultiHeadCausalAttention
 
 
 # Training text
